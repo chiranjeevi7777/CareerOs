@@ -1,4 +1,4 @@
-# 🚀 Job Hunt OS — AI-Powered Career Command Center
+# 🚀 CareerOs — AI-Powered Career Command Center
 
 <div align="center">
 

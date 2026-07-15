@@ -6,6 +6,13 @@ import toast from 'react-hot-toast';
 import { exportAllData, importAllData } from '../../services/storage';
 import { Button } from '../../shared/ui';
 
+const Section = ({ title, children }) => (
+  <div className="glass-card p-6 space-y-4">
+    <h3 className="font-bold text-slate-900 dark:text-white text-base border-b border-slate-200 dark:border-white/10 pb-3">{title}</h3>
+    {children}
+  </div>
+);
+
 export default function SettingsPage() {
   const { settings, updateSettings, theme, toggleTheme } = useApp();
   const [form, setForm] = useState({
@@ -72,13 +79,6 @@ export default function SettingsPage() {
       }
     }
   };
-
-  const Section = ({ title, children }) => (
-    <div className="glass-card p-6 space-y-4">
-      <h3 className="font-bold text-slate-900 dark:text-white text-base border-b border-slate-200 dark:border-white/10 pb-3">{title}</h3>
-      {children}
-    </div>
-  );
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">

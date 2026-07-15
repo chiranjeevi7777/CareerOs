@@ -42,7 +42,7 @@ __pycache__/
 .mypy_cache/
 
 # AI tooling — development-only skill packs, not part of the app
-skills/
+/skills/
 
 # Build artifacts
 dist/

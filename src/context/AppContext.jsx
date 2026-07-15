@@ -74,6 +74,7 @@ export const AppProvider = ({ children }) => {
     addApplication: appMod.addApplication,
     updateApplication: appMod.updateApplication,
     deleteApplication: appMod.deleteApplication,
+    setAllApplications: appMod.setAllApplications,
 
     // Interviews domain
     interviews: intMod.interviews,

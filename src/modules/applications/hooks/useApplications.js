@@ -30,5 +30,10 @@ export const useApplications = () => {
     persist(applications.filter((a) => a.id !== id));
   }, [applications, persist]);
 
-  return { applications, addApplication, updateApplication, deleteApplication };
+  const setAllApplications = useCallback((apps) => {
+    persist(apps);
+  }, [persist]);
+
+  return { applications, addApplication, updateApplication, deleteApplication, setAllApplications };
 };
+

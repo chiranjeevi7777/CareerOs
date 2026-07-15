@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Edit2, Trash2, ExternalLink, Check, Download, Briefcase } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, ExternalLink, Check, Download, Upload, Briefcase } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Modal, Button, KpiCard, EmptyState } from '../../shared/ui';
 import { APPLICATION_STATUSES, PLATFORMS, WORK_MODES, STATUS_COLORS } from './constants';
+import { exportJobApplications, parseJobApplicationsFile } from '../../../lib/jobApplicationsIO';
 
 const emptyForm = {
   company: '',
@@ -18,7 +19,7 @@ const emptyForm = {
 };
 
 export default function ApplicationsPage() {
-  const { applications, addApplication, updateApplication, deleteApplication } = useApp();
+  const { applications, addApplication, updateApplication, deleteApplication, setAllApplications } = useApp();
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -28,6 +29,56 @@ export default function ApplicationsPage() {
   const [sortBy, setSortBy] = useState('date');
 
   const setFormField = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  const handleExportJSON = () => {
+    try {
+      exportJobApplications(applications);
+      toast.success('Applications exported to JSON!');
+    } catch (e) {
+      toast.error('Failed to export applications: ' + e.message);
+    }
+  };
+
+  const handleImportJSON = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const validated = await parseJobApplicationsFile(file);
+        
+        const proceed = confirm(`Successfully validated backup containing ${validated.length} applications.\n\nDo you want to import these applications?`);
+        if (!proceed) return;
+
+        const merge = confirm(
+          "Would you like to MERGE these applications with your existing ones?\n\n" +
+          "- Click OK to MERGE (keep current applications and add imported ones).\n" +
+          "- Click Cancel to REPLACE (overwrite all current applications with imported ones)."
+        );
+
+        if (merge) {
+          const existingIds = new Set(applications.map(a => a.id));
+          const newApps = validated.map(app => {
+            if (existingIds.has(app.id)) {
+              return { ...app, id: Math.random().toString(36).substr(2, 9) + Date.now().toString(36) };
+            }
+            return app;
+          });
+          setAllApplications([...newApps, ...applications]);
+          toast.success(`Successfully merged ${newApps.length} applications!`);
+        } else {
+          setAllApplications(validated);
+          toast.success(`Successfully replaced with ${validated.length} applications!`);
+        }
+      } catch (err) {
+        toast.error('Import failed: ' + err.message);
+      }
+    };
+    input.click();
+  };
 
   const openAddModal = () => {
     setForm(emptyForm);
@@ -146,8 +197,14 @@ export default function ApplicationsPage() {
           </select>
         </div>
         <div className="flex gap-2 flex-shrink-0 w-full md:w-auto">
-          <Button onClick={exportCSV} variant="secondary" className="flex-1 md:flex-initial text-sm">
+          <Button onClick={exportCSV} variant="secondary" className="flex-1 md:flex-initial text-sm" title="Export as CSV">
             <Download className="w-4 h-4" /> CSV
+          </Button>
+          <Button onClick={handleExportJSON} variant="secondary" className="flex-1 md:flex-initial text-sm" title="Export as JSON">
+            <Download className="w-4 h-4" /> JSON
+          </Button>
+          <Button onClick={handleImportJSON} variant="secondary" className="flex-1 md:flex-initial text-sm" title="Import from JSON">
+            <Upload className="w-4 h-4" /> JSON
           </Button>
           <Button onClick={openAddModal} variant="primary" className="flex-1 md:flex-initial text-sm">
             <Plus className="w-4 h-4" /> Add

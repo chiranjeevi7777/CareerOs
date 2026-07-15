@@ -278,3 +278,21 @@
   .surface-low { background: #1b1b20; }
   .surface-high { background: #2a292f; }
 }
+
+
+:root {
+  --bg: #ffffff;
+  --fg: #0f172a;
+  --muted: #f1f5f9;
+  --border: #e2e8f0;
+}
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --fg: #e2e8f0;
+  --muted: #1e293b;
+  --border: #334155;
+}
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+}

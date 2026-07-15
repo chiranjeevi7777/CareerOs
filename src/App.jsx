@@ -1,3 +1,21 @@
+
+function toggleTheme() {
+  const root = document.documentElement;
+  const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  try { localStorage.setItem("theme", next); } catch {}
+}
+function initTheme() {
+  try {
+    const saved = localStorage.getItem("theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+    else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  } catch {}
+}
+initTheme();
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -21,6 +39,9 @@ import { SettingsPage } from './modules/settings';
 
 export default function App() {
   return (
+    <>
+    <button type="button" onClick={toggleTheme} aria-label="Toggle dark mode" style={{position:"fixed",bottom:16,right:16,zIndex:50}}>Theme</button>
+
     <AppProvider>
       <BrowserRouter>
         <Toaster
